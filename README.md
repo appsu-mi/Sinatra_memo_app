@@ -1,3 +1,5 @@
+## アプリケーションの動かし方
+
 1. コードをクローンする。
 ```ruby
 $ git clone git@github.com:appsu-mi/Sinatra_memo_app.git
