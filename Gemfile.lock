@@ -114,6 +114,7 @@ PLATFORMS
 DEPENDENCIES
   erb_lint
   rack-flash3
+  rubocop
   sinatra (~> 3.1)
   sinatra-contrib
   webrick
