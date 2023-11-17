@@ -6,28 +6,26 @@ require 'securerandom'
 require 'sinatra'
 require 'sinatra/reloader'
 require 'rack/flash'
+require 'uri'
 
 enable :sessions
 use Rack::Flash, sweep: true
-error_message = '※空欄では保存出来ません。テキストを挿入してください。'
+
+ERROR_MESSAGE = '※空欄では保存出来ません。テキストを挿入してください。'
 
 # データベース, エスケープ, バリデーション
 
 def find_all_record
-  exist_record? ? File.open('datas.json', 'r') { |f| JSON.parse(f.read, symbolize_names: true) } : nil
-end
-
-def exist_record?
-  File.exist?('datas.json')
+  File.exist?('datas.json') ? File.open('datas.json', 'r') { |f| JSON.parse(f.read, symbolize_names: true) } : nil
 end
 
 def save_overwrite(collected_records)
-  File.open('datas.json', 'w') do |f|
-    f.write(collected_records)
-  end
+  File.open('datas.json', 'w') { |f| f.write(collected_records) }
 end
 
-def create(new_record, record_id)
+def create(params)
+  record_id = SecureRandom.uuid
+  new_record = to_escape(params)
   collected_records = find_all_record&.merge({ record_id => new_record }) || { record_id => new_record }
   save_overwrite(JSON.pretty_generate(collected_records))
 end
@@ -57,40 +55,38 @@ get '/' do
   erb :index
 end
 
-get '/new' do
+get '/memo' do
   erb :new
 end
 
-post '/new' do
+post '/memo' do
   if validate_blank?(params)
-    flash[:error_message] = error_message
+    flash[:error_message] = ERROR_MESSAGE
     erb :new
   else
-    record_id = SecureRandom.uuid
-    new_record = to_escape(params)
-    create(new_record, record_id)
-
+    create(params)
     redirect '/'
     erb :index
   end
 end
 
-get '/show/:id' do |id|
+get '/memo/:id' do |id|
   @record_id = id
   @record = find_all_record[@record_id.to_sym]
   erb :show
 end
 
-get '/edit/:id' do |id|
+get '/memo/:id/edit' do |id|
   @record_id = id
   @record = find_all_record[@record_id.to_sym]
   erb :edit
 end
 
-patch '/edit/:id' do |id|
+patch '/memo/:id' do |id|
   if validate_blank?(params)
-    flash[:error_message] = error_message
-    redirect to("/edit/#{id}?title=#{params['title']}&description=#{params['description']}")
+    flash[:error_message] = ERROR_MESSAGE
+    encoded_params = URI.encode_www_form({ 'title' => params['title'], 'description' => params['description'] })
+    redirect to("/memo/#{id}/edit?#{encoded_params}")
     erb :edit
   else
     new_record = to_escape({ title: params['title'], description: params['description'] })
@@ -101,7 +97,7 @@ patch '/edit/:id' do |id|
   end
 end
 
-delete '/delete/:id' do |id|
+delete '/memo/:id' do |id|
   delete(id.to_sym)
   flash[:delete_message] = 'memoを削除しました。'
 

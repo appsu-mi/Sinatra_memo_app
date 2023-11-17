@@ -4,8 +4,8 @@
 </div>
 
 <div class="d-flex justify-content-around">
-  <a href="/edit/<%= @record_id %>" class="d-block btn text-white bg-secondary px-5">編集</a>
-  <form action="/delete/<%= @record_id %>" method="post">
+  <a href="/memo/<%= @record_id %>/edit" class="d-block btn text-white bg-secondary px-5">編集</a>
+  <form action="/memo/<%= @record_id %>" method="post">
     <input type="submit" value="削除" class="d-block btn text-white bg-secondary px-5">
     <input type="hidden" value="delete" name="_method">
   </form>

@@ -2,8 +2,6 @@
 
 source 'https://rubygems.org'
 
-# gem 'rails' 
-
 gem 'erb_lint', require: false
 gem 'rack-flash3'
 gem 'rubocop', require: false

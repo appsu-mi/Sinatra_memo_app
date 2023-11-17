@@ -1,4 +1,4 @@
-<form method="post" action="/edit/<%= @record_id %>">
+<form method="post" action="/memo/<%= @record_id %>">
   <%= flash[:error_message] %>
   <input type="text" name="title" value="<%= params['title'] || @record[:title] %>" class="form-control border-secondary mb-4">
   <textarea name="description" rows="20" class="form-control border-secondary mb-4"><%= params['description'] || @record[:description] %></textarea>
