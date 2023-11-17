@@ -8,11 +8,15 @@ $ git clone git@github.com:appsu-mi/Sinatra_memo_app.git
 ```ruby
 $ cd Sinatra_memo_app/
 ```
-3. 必要なGemファイルをインストールする。
+3. PRをfetchする。
 ```ruby
-$ bundle install
+$ git fetch origin pull/1/head:my-memo
 ```
-4. アプリを起動する。
+4. ブランチをチェックアウトする。
+```ruby
+$ git checkout my-memo
+```
+5. アプリを起動する。
 ```ruby
 $ bundle exec ruby app.rb
 ```
