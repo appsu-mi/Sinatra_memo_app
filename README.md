@@ -20,16 +20,7 @@ git checkout my-memo
 ```ruby
 bundle install
 ```
-6. ERB LIntの設定
-   * `.erb-lint.yml` を以下の内容でプロジェクトのルートに作成する。
-   ```ruby
-    ---
-    glob: "**/*.erb"
-    linters:
-      RequireInputAutocomplete:
-        enabled: false
-    ```
-5. アプリを起動する。
+6. アプリを起動する。
 ```ruby
 bundle exec ruby app.rb
 ```
