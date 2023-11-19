@@ -1,0 +1,6 @@
+<form method="post" action="/memo" class="w-100">
+  <%= flash[:error_message] %>
+  <input type="text" name="title" class="form-control border-secondary mb-4" value="<%= params["title"] %>">
+  <textarea name="description" rows="20" class="form-control border-secondary mb-4"><%= params["description"] %></textarea>
+  <input type="submit" value="保存" class="d-block btn text-white bg-secondary px-5 mx-auto">
+</form>

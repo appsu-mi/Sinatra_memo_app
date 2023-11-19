@@ -1,0 +1,12 @@
+<div class="mb-5 text-center">
+  <h2 class="mb-4"><%= @record[:title] %></h3>
+  <p><%= @record[:description] %></p>
+</div>
+
+<div class="d-flex justify-content-around">
+  <a href="/memo/<%= @record_id %>/edit" class="d-block btn text-white bg-secondary px-5">編集</a>
+  <form action="/memo/<%= @record_id %>" method="post">
+    <input type="submit" value="削除" class="d-block btn text-white bg-secondary px-5">
+    <input type="hidden" value="delete" name="_method">
+  </form>
+</div>
