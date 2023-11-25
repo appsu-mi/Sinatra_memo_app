@@ -24,7 +24,7 @@ bundle install
 ```ruby
 brew install postgresql
 ```
-7.postgresの起動
+7. postgresの起動
 ```ruby
 brew services start postgresql@<バージョン>
 ```
