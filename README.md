@@ -32,11 +32,11 @@ brew services start postgresql@<バージョン>
 ```ruby
 createdb memo_app
 ```
-8. データベースへ接続
+9. データベースへ接続
 ```ruby
 psql -d memo_app
 ```
-9. テーブルを作成
+10. テーブルを作成
 ```ruby
 create table memos (
   id serial,
@@ -45,11 +45,11 @@ create table memos (
   primary key (id)
 );
 ```
-10. psqlを閉じる
+11. psqlを閉じる
 ```ruby
 \q
 ```
-11. アプリを起動する
+12. アプリを起動する
 ```ruby
 bundle exec ruby app.rb
 ```
