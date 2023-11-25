@@ -1,11 +1,9 @@
 <p class="mb-4"><%= flash[:delete_message] %></p>
 
-<% if @all_record %>
-  <% @all_record.each do |record| %>
+<% @records.each do |record| %>
   <ul>
     <li>
-      <a href="/memo/<%= record[0] %>" class="border-bottom d-block w-100 mb-2"><%= record[1][:title] %></a>
+      <a href="/memo/<%= record[0] %>" class="border-bottom d-block w-100 mb-2"><%= record[1] %></a>
     </li>
   </ul>
-  <% end %>
 <% end %>

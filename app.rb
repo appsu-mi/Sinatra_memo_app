@@ -2,6 +2,7 @@
 
 require 'cgi'
 require 'json'
+require 'pg'
 require 'securerandom'
 require 'sinatra'
 require 'sinatra/reloader'
@@ -11,37 +12,40 @@ require 'uri'
 enable :sessions
 use Rack::Flash, sweep: true
 
+DATABASE = PG::Connection.open(dbname: 'memo_app')
+
 ERROR_MESSAGE = '※空欄では保存出来ません。テキストを挿入してください。'
 
 # データベース, エスケープ, バリデーション
-
-def find_all_record
-  File.exist?('datas.json') ? File.open('datas.json', 'r') { |f| JSON.parse(f.read, symbolize_names: true) } : nil
+def execute(query, params = nil, delete: false)
+  delete ? DATABASE.exec(query) : DATABASE.exec_params(query, params)
 end
 
-def save_overwrite(collected_records)
-  File.open('datas.json', 'w') { |f| f.write(collected_records) }
+def find_all
+  DATABASE.exec_params('SELECT * FROM memos ORDER BY id').values
+end
+
+def find(id)
+  DATABASE.exec_params("SELECT * FROM memos WHERE id = #{id}")[0]
 end
 
 def create(params)
-  record_id = SecureRandom.uuid
-  new_record = to_escape(params)
-  collected_records = find_all_record&.merge({ record_id => new_record }) || { record_id => new_record }
-  save_overwrite(JSON.pretty_generate(collected_records))
+  query = 'INSERT INTO memos (title, description) VALUES ($1, $2)'
+  execute(query, params)
 end
 
-def update(new_record, params_id)
-  collected_records = find_all_record.each { |record_id, record| record.replace(new_record) if record_id == params_id }
-  save_overwrite(JSON.pretty_generate(collected_records))
+def update(id, params)
+  query = "UPDATE memos SET title = $1, description = $2 WHERE id = #{id}"
+  execute(query, params)
 end
 
-def delete(params_id)
-  collected_records = find_all_record.delete_if { |record_id| record_id == params_id }
-  save_overwrite(JSON.pretty_generate(collected_records))
+def delete(id)
+  query = "DELETE FROM memos WHERE id = #{id};"
+  execute(query, delete: true)
 end
 
 def to_escape(params)
-  params.transform_values { |value| CGI.escapeHTML(value) }
+  params.map { |value| CGI.escapeHTML(value) }
 end
 
 def validate_blank?(params)
@@ -50,11 +54,13 @@ end
 
 # ルーティング
 
+# home
 get '/' do
-  @all_record = find_all_record
+  @records = find_all
   erb :index
 end
 
+# new/create
 get '/memo' do
   erb :new
 end
@@ -64,21 +70,22 @@ post '/memo' do
     flash[:error_message] = ERROR_MESSAGE
     erb :new
   else
-    create(params)
+    escaped_params = to_escape([params[:title], params[:description]])
+    create(escaped_params)
     redirect '/'
     erb :index
   end
 end
 
+# show
 get '/memo/:id' do |id|
-  @record_id = id
-  @record = find_all_record[@record_id.to_sym]
+  @record = find(id)
   erb :show
 end
 
+# edit/update
 get '/memo/:id/edit' do |id|
-  @record_id = id
-  @record = find_all_record[@record_id.to_sym]
+  @record = find(id)
   erb :edit
 end
 
@@ -89,18 +96,17 @@ patch '/memo/:id' do |id|
     redirect to("/memo/#{id}/edit?#{encoded_params}")
     erb :edit
   else
-    new_record = to_escape({ title: params['title'], description: params['description'] })
-    update(new_record, id.to_sym)
-
+    escaped_params = to_escape([params[:title], params[:description]])
+    update(id, escaped_params)
     redirect '/'
     erb :index
   end
 end
 
+# delete
 delete '/memo/:id' do |id|
-  delete(id.to_sym)
+  delete(id)
   flash[:delete_message] = 'memoを削除しました。'
-
   redirect '/'
   erb :index
 end
