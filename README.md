@@ -24,7 +24,7 @@ bundle install
 ```ruby
 brew install postgresql
 ```
-7. postgresの起動
+7. postgresqlの起動
 ```ruby
 brew services start postgresql@<バージョン>
 ```
@@ -45,7 +45,7 @@ create table memos (
   primary key (id)
 );
 ```
-11. psqlを閉じる
+11. postgresqlを閉じる
 ```ruby
 \q
 ```
